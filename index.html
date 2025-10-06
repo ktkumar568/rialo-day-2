@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rialo Quiz — Colorful Dark Theme</title>
+  <style>
+    :root{
+      --bg:#08070a; /* deep black */
+      --panel:#0f0e13;
+      --muted:#9aa0a6;
+      --accent1:#7c5cff; /* violet */
+      --accent2:#00e6a8; /* teal */
+      --accent3:#ff7ab6; /* pink */
+      --glass: rgba(255,255,255,0.04);
+      --success:#23d18b;
+      --danger:#ff6b6b;
+      --card-shadow: 0 10px 30px rgba(2,2,8,0.7);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    html,body{height:100%;}
+    body{
+      margin:0;
+      min-height:100%;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(124,92,255,0.08), transparent),
+                  radial-gradient(900px 500px at 90% 90%, rgba(0,230,168,0.04), transparent),
+                  var(--bg);
+      color:#e6eef6;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+    }
+
+    .container{
+      width:100%;
+      max-width:920px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      border-radius:14px;
+      box-shadow:var(--card-shadow);
+      overflow:hidden;
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap:0;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+
+    /* left panel */
+    .sidebar{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      padding:28px;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      border-right:1px solid rgba(255,255,255,0.02);
+    }
+    .brand{
+      display:flex;align-items:center;gap:12px;
+    }
+    .logo{
+      width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(135deg,var(--accent1),var(--accent2));
+      box-shadow: 0 4px 18px rgba(124,92,255,0.14), inset 0 -8px 30px rgba(255,255,255,0.03);
+      font-weight:700;color:white;font-size:20px;
+    }
+    .brand h1{margin:0;font-size:18px;letter-spacing:0.2px}
+    .brand p{margin:0;font-size:12px;color:var(--muted)}
+
+    .meta{display:flex;flex-direction:column;gap:8px}
+    .meta .desc{color:var(--muted);font-size:13px}
+    .meta .tags{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{padding:6px 10px;border-radius:999px;background:var(--glass);font-size:12px;color:var(--muted);border:1px solid rgba(255,255,255,0.02)}
+
+    .progress-box{margin-top:6px}
+    .progress{height:10px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
+    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent1),var(--accent3));width:0%;}
+
+    .info{font-size:13px;color:var(--muted);}
+    .btn{
+      display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;font-weight:600;border:none;cursor:pointer;
+      background:linear-gradient(90deg,var(--accent2),var(--accent1));color:#08070a;
+      box-shadow:0 8px 24px rgba(0,0,0,0.5);
+    }
+
+    /* right content */
+    .content{padding:28px;min-height:420px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);}
+    .question-header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .qtitle{font-size:18px;font-weight:700}
+    .qmeta{font-size:13px;color:var(--muted)}
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;margin-top:20px;border:1px solid rgba(255,255,255,0.02)}
+
+    .options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+    .option{padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);cursor:pointer;border:1px solid rgba(255,255,255,0.02);transition:all .18s ease}
+    .option:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(2,6,23,0.6)}
+    .option.selected{outline:2px solid rgba(124,92,255,0.35);box-shadow:0 8px 30px rgba(124,92,255,0.06)}
+
+    .controls{display:flex;align-items:center;justify-content:space-between;margin-top:18px;gap:12px}
+    .controls .left{display:flex;gap:10px}
+
+    .small{font-size:13px;color:var(--muted)}
+
+    .result{display:none;padding:18px;border-radius:12px;margin-top:18px;background:linear-gradient(90deg, rgba(34,40,49,0.4), rgba(12,10,18,0.4));}
+    .result.show{display:block}
+
+    .score{font-size:36px;font-weight:800}
+    .breakdown{display:flex;gap:12px;margin-top:12px}
+    .badge{padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.02);font-weight:700}
+
+    footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
+
+    @media (max-width:880px){
+      .container{grid-template-columns:1fr;}
+      .sidebar{order:2}
+      .content{order:1}
+      .options{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="application" aria-label="Rialo styled quiz">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">R</div>
+        <div>
+          <h1>Rialo Quiz</h1>
+          <p>Learn the platform — fast, friendly, and colorful.</p>
+        </div>
+      </div>
+
+      <div class="meta">
+        <div class="desc">10 questions — 4 options each. Dark, accessible UI inspired by Rialo design language with fresh colorful accents.</div>
+        <div class="tags">
+          <span class="chip">Real World Data</span>
+          <span class="chip">No Oracles</span>
+          <span class="chip">Encrypted Messaging</span>
+        </div>
+      </div>
+
+      <div class="progress-box">
+        <div class="small">Progress</div>
+        <div class="progress" aria-hidden="true"><i id="progBar"></i></div>
+        <div class="small" style="margin-top:8px"><strong id="qnCurr">0</strong> / 10 answered</div>
+      </div>
+
+      <div style="flex:1"></div>
+      <div style="display:flex;gap:10px;flex-direction:column">
+        <button id="restartBtn" class="btn">Restart Quiz</button>
+        <button id="exportBtn" class="btn" style="background:linear-gradient(90deg,var(--accent3),var(--accent2));">Export Results</button>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="question-header">
+        <div>
+          <div class="qtitle" id="qTitle">Question</div>
+          <div class="qmeta" id="qMeta">Question 1 of 10</div>
+        </div>
+        <div class="small">Time: <span id="timer">00:00</span></div>
+      </div>
+
+      <div class="card">
+        <div id="qText">Loading…</div>
+        <div class="options" id="options"></div>
+
+        <div class="controls">
+          <div class="left">
+            <button id="prevBtn" class="btn" style="background:transparent;color:var(--muted);box-shadow:none;border:1px solid rgba(255,255,255,0.03);">Previous</button>
+            <button id="nextBtn" class="btn">Next</button>
+          </div>
+          <div class="small">Selected: <strong id="selectedCount">0</strong></div>
+        </div>
+
+        <div class="result" id="resultBox">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+            <div>
+              <div class="score" id="finalScore">0/10</div>
+              <div class="small">Your score</div>
+            </div>
+            <div>
+              <div class="breakdown">
+                <div class="badge">Correct: <span id="corr">0</span></div>
+                <div class="badge">Wrong: <span id="wr">0</span></div>
+                <div class="badge">Unanswered: <span id="un">0</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <footer>Designed with ❤️ — Fresh Rialo-inspired dark theme</footer>
+    </main>
+  </div>
+
+  <script>
+    // Questions (10) — based on the Rialo homepage content you provided earlier
+    const QUESTIONS = [
+      {q:"What is Rialo’s tagline / positioning (as on their homepage)?", opts:["A. \"A next-gen Layer 1 blockchain\"","B. \"Rethink. Rebuild. Rialo.\"","C. \"Blockchain for Enterprises\"","D. \"Your gateway to DeFi\""], answer:1},
+      {q:"Which of the following is NOT claimed as a feature of Rialo?", opts:["A. Native delivery of real-world data","B. Eliminating middleware stacks","C. Built-in wallet for users","D. Real-world privacy / encrypted messaging"], answer:2},
+      {q:"Rialo states that apps on their network can send encrypted messages to real people via:", opts:["A. Social media profiles","B. Email, phone, or device ID","C. On-chain wallet addresses only","D. Messaging platforms (e.g., Telegram)"], answer:1},
+      {q:"Which of these is a statement Rialo makes about its architecture?", opts:["A. Rialo is a Layer 1 chain","B. Rialo depends heavily on external oracles","C. Rialo is NOT a Layer 1","D. Rialo is a sidechain of Ethereum"], answer:2},
+      {q:"Rialo claims that data can move between apps and chains without:", opts:["A. Bridges, wrappers, or hacks","B. Smart contracts","C. Cross-chain protocols","D. Wallet integration"], answer:0},
+      {q:"Which of the following is NOT a benefit that Rialo advertises?", opts:["A. No delays / real-time reactions","B. Removing oracles entirely","C. Stable gas costs","D. Middleware becomes optional"], answer:1},
+      {q:"According to the homepage, Rialo enables:", opts:["A. Apps to launch faster, integrate less code, ship faster","B. Users to stake tokens to control app logic","C. Ultra-low transaction costs via miner subsidies","D. Centralized control over smart contracts"], answer:0},
+      {q:"Which phrase indicates Rialo’s approach to on-chain + off-chain interaction?", opts:["A. \"Real World Apps\"","B. \"Oracles everywhere\"","C. \"Layered architecture\"","D. \"Sidechain aggregation\""], answer:0},
+      {q:"Which of these statements best describes \"Real World Data\" according to Rialo?", opts:["A. Off-chain data fed via oracles with high fees","B. Data delivered natively on chain, trust minimized, without external oracles","C. Data stored off-chain and referenced by hashes","D. Data is only historical, not real-time"], answer:1},
+      {q:"On the Rialo homepage, what action does the site ask visitors to take?", opts:["A. Download the Rialo wallet app","B. Join the waitlist / Request early access","C. Stake tokens for early rewards","D. Vote on governance proposals"], answer:1}
+    ];
+
+    // state
+    let state = {idx:0, answers:Array(QUESTIONS.length).fill(null), startedAt: null, timerInterval:null};
+
+    const qTitle = document.getElementById('qTitle');
+    const qMeta = document.getElementById('qMeta');
+    const qText = document.getElementById('qText');
+    const optsBox = document.getElementById('options');
+    const progBar = document.getElementById('progBar');
+    const qnCurr = document.getElementById('qnCurr');
+    const selectedCount = document.getElementById('selectedCount');
+    const timer = document.getElementById('timer');
+
+    function startTimer(){
+      if(state.timerInterval) clearInterval(state.timerInterval);
+      state.startedAt = Date.now();
+      state.timerInterval = setInterval(()=>{
+        const s = Math.floor((Date.now()-state.startedAt)/1000);
+        const mm = String(Math.floor(s/60)).padStart(2,'0');
+        const ss = String(s%60).padStart(2,'0');
+        timer.textContent = `${mm}:${ss}`;
+      },500);
+    }
+
+    function render(){
+      const q = QUESTIONS[state.idx];
+      qTitle.textContent = `Question ${state.idx+1}`;
+      qMeta.textContent = `Question ${state.idx+1} of ${QUESTIONS.length}`;
+      qText.textContent = q.q;
+
+      optsBox.innerHTML = '';
+      q.opts.forEach((o,i)=>{
+        const div = document.createElement('button');
+        div.className = 'option';
+        div.setAttribute('role','button');
+        div.setAttribute('aria-pressed', state.answers[state.idx]===i);
+        div.innerHTML = `<div style="font-weight:700;">${String.fromCharCode(65+i)}.</div><div style="margin-top:6px;color:var(--muted);font-size:13px">${o.replace(/^[A-D]\.\s*/,'')}</div>`;
+        if(state.answers[state.idx]===i) div.classList.add('selected');
+        div.addEventListener('click', ()=>{
+          state.answers[state.idx] = i;
+          render();
+          updateProgress();
+        });
+        optsBox.appendChild(div);
+      });
+
+      selectedCount.textContent = state.answers.filter(x=>x!==null).length;
+      qnCurr.textContent = state.answers.filter(x=>x!==null).length;
+
+      // progress bar width
+      const pct = Math.round((state.answers.filter(x=>x!==null).length/QUESTIONS.length)*100);
+      progBar.style.width = pct + '%';
+
+      // show result if at end
+      const resultBox = document.getElementById('resultBox');
+      if(state.idx === QUESTIONS.length){
+        showResult();
+      } else {
+        resultBox.classList.remove('show');
+      }
+    }
+
+    function updateProgress(){
+      const answered = state.answers.filter(x=>x!==null).length;
+      const pct = Math.round((answered/QUESTIONS.length)*100);
+      progBar.style.width = pct + '%';
+      qnCurr.textContent = answered;
+      selectedCount.textContent = answered;
+    }
+
+    document.getElementById('nextBtn').addEventListener('click', ()=>{
+      if(state.idx < QUESTIONS.length -1){ state.idx++; render(); }
+      else if(state.idx === QUESTIONS.length -1){ state.idx = QUESTIONS.length; // end
+        render(); showResult(); }
+    });
+    document.getElementById('prevBtn').addEventListener('click', ()=>{
+      if(state.idx>0){ state.idx--; render(); }
+    });
+
+    function showResult(){
+      // score calculation
+      let corr = 0, wrong = 0, un = 0;
+      QUESTIONS.forEach((q,i)=>{
+        const a = state.answers[i];
+        if(a === null) un++;
+        else if(a === q.answer) corr++;
+        else wrong++;
+      });
+      document.getElementById('corr').textContent = corr;
+      document.getElementById('wr').textContent = wrong;
+      document.getElementById('un').textContent = un;
+      document.getElementById('finalScore').textContent = `${corr}/${QUESTIONS.length}`;
+      document.getElementById('resultBox').classList.add('show');
+    }
+
+    document.getElementById('restartBtn').addEventListener('click', ()=>{
+      state.idx = 0; state.answers = Array(QUESTIONS.length).fill(null); startTimer(); updateProgress(); render();
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', ()=>{
+      const data = {
+        startedAt: state.startedAt,
+        answers: state.answers,
+        score: state.answers.reduce((s,a,i)=> a===QUESTIONS[i].answer? s+1: s, 0),
+        questions: QUESTIONS.map((q, i)=>({q:q.q, selected: state.answers[i], correct: q.answer}))
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'rialo-quiz-results.json'; a.click(); URL.revokeObjectURL(url);
+    });
+
+    // keyboard navigation
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'ArrowRight') document.getElementById('nextBtn').click();
+      if(e.key === 'ArrowLeft') document.getElementById('prevBtn').click();
+      if(e.key === '1' || e.key === '2' || e.key === '3' || e.key === '4'){
+        const k = parseInt(e.key,10)-1;
+        state.answers[state.idx] = k; render(); updateProgress();
+      }
+    });
+
+    // init
+    startTimer(); render(); updateProgress();
+  </script>
+</body>
+</html>
